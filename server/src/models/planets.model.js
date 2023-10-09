@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path"); //used whenever looking for a relative path
 const { parse } = require("csv-parse");
 
-const habitablePlanets = [];
+const planets = require("./planets.mongo");
 
 function isHabitable(planet) {
   return (
@@ -13,19 +13,6 @@ function isHabitable(planet) {
   );
 }
 
-/**
- * const promise = new Promise((resolve, reject) => {
- *  resolve(42);
- * });
- * promise.then((result) => {
- *
- * });
- *
- * const result = await promise;
- * console.log(result);
- *
- */
-
 //using a promise to ensure that before making a request for planets the data is loaded
 function loadPlanetsData() {
   return new Promise((resolve, reject) => {
@@ -33,24 +20,48 @@ function loadPlanetsData() {
       path.join(__dirname, "..", "..", "data", "kepler_data.csv")
     )
       .pipe(parse({ comment: "#", columns: true }))
-      .on("data", (data) => {
+      .on("data", async (data) => {
         if (isHabitable(data)) {
-          habitablePlanets.push(data);
+          savePlanet(data);
         }
       })
       .on("error", (error) => {
         console.log(error);
         reject(error); //if promise fails
       })
-      .on("end", () => {
+      .on("end", async () => {
+        const countPlanetsFound = (await getAllPlanets()).length;
         console.log("Loading planets...");
-        console.log(`${habitablePlanets.length} habitable planets were found!`);
+        console.log(`${countPlanetsFound} habitable planets were found!`);
         resolve(); //if promise succeeds
       });
   });
 }
 
+async function getAllPlanets() {
+  return await planets.find({}, { _id: 0, __v: 0 });
+}
+
+async function savePlanet(planet) {
+  //planet will  be added if do not exists
+  try {
+    await planets.updateOne(
+      {
+        keplerName: planet.kepler_name,
+      },
+      {
+        keplerName: planet.kepler_name,
+      },
+      {
+        upsert: true,
+      }
+    );
+  } catch (err) {
+    console.error(`Could not save a planet ${err}`);
+  }
+}
+
 module.exports = {
   loadPlanetsData,
-  planets: habitablePlanets,
+  getAllPlanets,
 };
