@@ -36,8 +36,6 @@ async function httpAddNewLaunch(req, res) {
   //call the model function
   await scheduleNewLunch(launch);
 
-  console.log(launch);
-
   //return the response
   return res.status(201).json(launch);
 }
