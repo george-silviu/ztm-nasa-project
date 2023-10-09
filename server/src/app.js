@@ -3,8 +3,8 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 
-const planetsRouter = require("./routes/planets/planets.router");
-const launchesRouter = require("./routes/launches/launches.router");
+//import api v1 routes
+const v1 = require("./routes/v1");
 
 const app = express();
 
@@ -23,9 +23,8 @@ app.use(express.json());
 //serve built version of app front-end
 app.use(express.static(path.join(__dirname, "..", "public")));
 
-//mount API routers
-app.use("/planets", planetsRouter);
-app.use("/launches", launchesRouter);
+//mount v1 API routers
+app.use("/v1", v1);
 
 //serving react apps with client-side routing
 app.get("/*", (req, res) => {
