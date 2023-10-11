@@ -20,7 +20,7 @@ async function startServer() {
   //wait the planets data to load
   await loadPlanetsData();
 
-  //get lauch data from launch model (SplaceX launches)
+  //get lauch data from launch model (SpaceX API launches)
   await loadLaunchesData();
 
   //server starts to listen for requests
