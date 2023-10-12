@@ -1,11 +1,13 @@
+const app = require("../../app");
 const request = require("supertest");
-const app = require("../../app"); //require express app
 const { mongoConnect, mongoDisconnect } = require("../../services/mongo");
+const { loadPlanetsData } = require("../../models/planets.model");
 
 describe("Launches API", () => {
   //before running all test connect to mongo
   beforeAll(async () => {
     await mongoConnect();
+    await loadPlanetsData(); //load the planets into the CI server before testing the launches API
   });
   //after all tests disconnect from mongo
   afterAll(async () => {
